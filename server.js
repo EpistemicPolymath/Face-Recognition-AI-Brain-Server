@@ -3,8 +3,20 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 const cors = require('cors');
+const env = require('./env.json');
+const database_password = env['database_password'];
+const knex = require('knex');
 
-
+// Postgres Database Connection
+const db = knex({
+  client: 'pg',
+  connection: {
+    host : '127.0.0.1',
+    user : 'postgres',
+    password : database_password,
+    database : 'smart-brain'
+  }
+});
 
 // Create our app by running Express
 const app = express();
@@ -78,15 +90,18 @@ app.post('/register', (req, res) => {
         console.log(hash);
     });
     // Creating a new user
-    database.users.push({
-      id: '125', // This should increment each time
-      name: name,
-      email: email,
-      entries: 0,
-      joined: new Date()
-    });
-    // Grabs the last user in the array
-    res.json(database.users[database.users.length-1]);
+    db('users')
+      .returning('*')
+      .insert({
+        email: email,
+        name: name,
+        joined: new Date()
+    })
+      .then(user => {
+        // Grabs the last user in the array
+        res.json(user[0]);
+      })
+      .catch(err => res.status(400).json('Unable to register'));
 });
 
 // Profile ID Endpoint
