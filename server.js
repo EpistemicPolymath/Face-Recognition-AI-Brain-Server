@@ -25,35 +25,13 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-// Database Variable
-const database = {
-    users: [
-        {
-          id: '123',
-          name: 'Poly',
-          password: 'gaming',
-          email: 'poly@gmail.com',
-          entries: 0,
-          joined: new Date()
-        },
-        {
-          id: '124',
-          name: 'Dan',
-          password: 'workout',
-          email: 'dan@gmail.com',
-          entries: 0,
-          joined: new Date()
-        }
-    ],
-    login: [
-        {
-          id: '987',
-          hash: '',
-          email: 'poly@gmail.com',
-
-        },
-    ]
-}
+/**
+ *  Root Route: / --> res = this is working
+ *  SignIn: /signin --> POST = success/fail
+ *  Register: /register --> POST = user
+ *  Profile: /profile/:userId --> GET
+ *  Image: /image --> PUT --> user (count for face detections)
+ */
 
 // Get Request on the Root Route
 app.get('/', (req, res) => {
@@ -62,22 +40,25 @@ app.get('/', (req, res) => {
 
 // Signin Endpoint
 app.post('/signin', (req, res) => {
-  // Load hash from your password DB.
-  bcrypt.compare('gaming', '$2b$10$EgGfOvi30VFWb0dv1fKgyekEScbpIYNX1YkpSFQARKE46o7nAX9Hq').then(function(res) {
-      // res == true
-      console.log('Hash password Worked', res);
-  });
-  bcrypt.compare('veggies', '$2b$10$EgGfOvi30VFWb0dv1fKgyekEScbpIYNX1YkpSFQARKE46o7nAX9Hq').then(function(res) {
-      // res == false
-      console.log('Hash password failed', res);
-  });
-  // We would ideally loop through the database
-  if (req.body.email === database.users[0].email &&
-      req.body.password === database.users[0].password) {
-        res.json(database.users[0]);
-      } else {
-        res.status(400).json('error logging in');
-      }
+    db.select('email', 'hash').from('login')
+      .where('email', '=', req.body.email)
+      .then(data => {
+        // Check hashed password
+        // Load hash from your password DB.
+        const isValid = bcrypt.compareSync(req.body.password, data[0].hash);
+        if (isValid) {
+          return db.select('*').from('users')
+              .where('email', '=', req.body.email)
+              .then(user => {
+                res.json(user[0])
+              })
+              .catch(err => res.status(400).json('Unable to get user'))
+        } else {
+          // If the hash password check is not valid
+          res.status(400).json('Incorrect password');
+        }
+      })
+      .catch(err => res.status(400).json('Wrong user credentials'))
 });
 
 // Register Endpoint
@@ -144,12 +125,3 @@ app.put('/image', (req, res) => {
 app.listen(3000, () => {
   console.log("app is running on port 3000");
 });
-
-
-/**
- *  Root Route: / --> res = this is working
- *  SignIn: /signin --> POST = success/fail
- *  Register: /register --> POST = user
- *  Profile: /profile/:userId --> GET
- *  Image: /image --> PUT --> user (count for face detections)
- */
