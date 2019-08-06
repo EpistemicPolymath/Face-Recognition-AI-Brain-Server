@@ -107,17 +107,15 @@ app.post('/register', (req, res) => {
 // Profile ID Endpoint
 app.get('/profile/:id', (req, res) => {
     const { id } = req.params;
-    let found = false;
-    database.users.forEach( user => {
-        if( user.id === id ) {
-          found = true;
-          return res.json(user);
+    db.select('*').from('users').where('id', id)
+      .then(user => {
+        if(user.length) { // If a user is found in db
+          res.json(user[0]);
+        } else {
+          res.status(400).json('User profile not found');
         }
-    });
-
-    if(!found){
-      res.status(400).json("No such user");
-    }
+      })
+      .catch(err => res.status(400).json('Error getting user profile'));
 });
 
 // Image Endpoint
