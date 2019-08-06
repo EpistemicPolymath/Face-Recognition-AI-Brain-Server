@@ -85,23 +85,34 @@ app.post('/register', (req, res) => {
     // Destructuring
     const { email, name, password } = req.body;
     // Bcrypt
-    bcrypt.hash(password, saltRounds).then(function(hash) {
-        // Store hash in your password DB.
-        console.log(hash);
-    });
-    // Creating a new user
-    db('users')
-      .returning('*')
-      .insert({
-        email: email,
-        name: name,
-        joined: new Date()
+    let hash = bcrypt.hashSync(password, saltRounds);
+  // Store hash in your password DB.
+  // Creating a transaction
+    db.transaction(trx => {
+        trx.insert({
+            hash: hash,
+            email: email
+        })
+        .into('login')
+        .returning('email')
+        .then(loginEmail => {
+          // Creating a new user
+          return trx('users')
+            .returning('*')
+            .insert({
+              email: loginEmail[0],
+              name: name,
+              joined: new Date()
+          })
+            .then(user => {
+              // Grabs the last user in the array
+              res.json(user[0]);
+            })
+        })
+        .then(trx.commit)
+        .catch(trx.rollback)
     })
-      .then(user => {
-        // Grabs the last user in the array
-        res.json(user[0]);
-      })
-      .catch(err => res.status(400).json('Unable to register'));
+    .catch(err => res.status(400).json('Unable to register'));
 });
 
 // Profile ID Endpoint
@@ -121,18 +132,12 @@ app.get('/profile/:id', (req, res) => {
 // Image Endpoint
 app.put('/image', (req, res) => {
   const { id } = req.body;
-  let found = false;
-  database.users.forEach( user => {
-      if( user.id === id ) {
-        found = true;
-        user.entries++;
-        return res.json(user.entries);
-      }
-  });
-
-  if(!found){
-    res.status(400).json("No such user");
-  }
+  db('users')
+    .where('id', '=', id)
+    .increment('entries', 1)
+    .returning('entries')
+    .then(entries => res.json(entries[0]))
+    .catch(err => res.status(400).json('Unable to update entries'))
 });
 
 // Setup server to listen on Port 3000
