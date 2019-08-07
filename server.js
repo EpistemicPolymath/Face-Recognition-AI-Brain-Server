@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 });
 
 // Signin Endpoint
-app.post('/signin', (req, res) => { signIn.handleSignIn(req, res, db, bcrypt)});
+app.post('/signin', signIn.handleSignIn(db, bcrypt)(req, res));
 
 // Register Endpoint
 app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt)});
