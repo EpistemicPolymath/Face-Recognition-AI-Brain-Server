@@ -44,7 +44,7 @@ app.get('/', (req, res) => {
 });
 
 // Signin Endpoint
-app.post('/signin', signIn.handleSignIn(db, bcrypt)(req, res));
+app.post('/signin', (req, res) => { signIn.handleSignIn( req, res, db, bcrypt)});
 
 // Register Endpoint
 app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt)});
@@ -54,6 +54,9 @@ app.get('/profile/:id', (req, res) => { profile.handleProfileGET(req, res, db)})
 
 // Image Endpoint
 app.put('/image', (req, res) => { image.handleImage(req, res, db)});
+
+// Clarifai API Endpoint
+app.post('/imageurl', (req, res) => { image.handleAPICall(req, res)});
 
 // Setup server to listen on Port 3000
 app.listen(3000, () => {
