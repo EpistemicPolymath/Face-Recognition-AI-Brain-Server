@@ -38,7 +38,7 @@ app.use(cors());
 
 // Get Request on the Root Route
 app.get('/', (req, res) => {
-    res.send(database.users);
+    res.send('It is working on Heroku!');
 });
 
 // Signin Endpoint
