@@ -57,6 +57,6 @@ app.put('/image', (req, res) => { image.handleImage(req, res, db)});
 app.post('/imageurl', (req, res) => { image.handleAPICall(req, res)});
 
 // Setup server to listen on Environmental Heroku Port
-app.listen(process.env.$PORT, () => {
-  console.log(`app is running on port ${process.env.$PORT}`);
+app.listen(process.env.PORT, () => {
+  console.log(`app is running on port ${process.env.PORT}`);
 });
