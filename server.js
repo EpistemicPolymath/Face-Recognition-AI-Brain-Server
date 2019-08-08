@@ -56,7 +56,7 @@ app.put('/image', (req, res) => { image.handleImage(req, res, db)});
 // Clarifai API Endpoint
 app.post('/imageurl', (req, res) => { image.handleAPICall(req, res)});
 
-// Setup server to listen on Port 3000
-app.listen(3000, () => {
-  console.log("app is running on port 3000");
+// Setup server to listen on Environmental Heroku Port
+app.listen(process.env.$PORT, () => {
+  console.log(`app is running on port ${process.env.$PORT}`);
 });
