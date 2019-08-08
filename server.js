@@ -2,8 +2,6 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-// const env = require('./env.json');
-// const database_password = env['database_password'];
 const knex = require('knex');
 
 // Endpoint Controllers
@@ -18,7 +16,7 @@ const db = knex({
   connection: {
     host : '127.0.0.1',
     user : 'postgres',
-    password : database_password,
+    password : process.env.DATABASE_PASSWORD,
     database : 'smart-brain'
   }
 });
