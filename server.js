@@ -28,7 +28,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-/**
+/***
  *  Root Route: / --> res = this is working
  *  SignIn: /signin --> POST = success/fail
  *  Register: /register --> POST = user
