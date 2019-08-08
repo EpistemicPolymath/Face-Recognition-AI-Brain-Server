@@ -1,8 +1,8 @@
 // Clarifai
 const Clarifai = require('clarifai');
 // Global Environmental Variables for API - For Privacy
-const env = require('../env.json');
-const apikey = env['apikey'];
+// const env = require('../env.json');
+// const apikey = env['apikey'];
 //Clarifai Initialization
 const app = new Clarifai.App ({
     apiKey: apikey

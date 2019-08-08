@@ -2,8 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const cors = require('cors');
-const env = require('./env.json');
-const database_password = env['database_password'];
+// const env = require('./env.json');
+// const database_password = env['database_password'];
 const knex = require('knex');
 
 // Endpoint Controllers
